@@ -11,6 +11,7 @@ import YAML from 'yamljs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import swaggerUiDist from 'swagger-ui-dist';
 
 // Get the directory name using ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -114,11 +115,65 @@ function generateUsers(numUsers, deptList) {
   return users;
 }
 
-// Serve Swagger UI as the default route
-app.use('/', swaggerUi.serve);
+// Get the path to swagger-ui-dist
+const swaggerUiDistPath = swaggerUiDist.getAbsoluteFSPath();
+
+// Serve Swagger UI static files
+app.use(express.static(swaggerUiDistPath));
+
+// Create a custom HTML for Swagger UI
 app.get('/', (req, res) => {
-  // Pass the dynamically modified swagger document
-  swaggerUi.setup(swaggerDocument)(req, res);
+  const swaggerInitializer = `
+    window.onload = function() {
+      const ui = SwaggerUIBundle({
+        url: "${serverUrl}/swagger.yaml",
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout"
+      });
+      window.ui = ui;
+    };
+  `;
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>User Generation Service API</title>
+      <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
+      <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+      <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+      <style>
+        html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body { margin: 0; background: #fafafa; }
+      </style>
+    </head>
+    <body>
+      <div id="swagger-ui"></div>
+      <script src="./swagger-ui-bundle.js"></script>
+      <script src="./swagger-ui-standalone-preset.js"></script>
+      <script>${swaggerInitializer}</script>
+    </body>
+    </html>
+  `;
+
+  res.setHeader('Content-Type', 'text/html');
+  res.send(html);
+});
+
+// Serve the swagger.yaml file
+app.get('/swagger.yaml', (req, res) => {
+  res.setHeader('Content-Type', 'text/yaml');
+  res.sendFile(path.join(__dirname, 'swagger.yaml'));
 });
 
 // API endpoint: /api/users/:count

@@ -12,6 +12,18 @@
   ],
   "routes": [
     {
+      "src": "/swagger-ui-bundle\\.js",
+      "dest": "node_modules/swagger-ui-express/static/swagger-ui-bundle.js"
+    },
+    {
+      "src": "/swagger-ui-standalone-preset\\.js",
+      "dest": "node_modules/swagger-ui-express/static/swagger-ui-standalone-preset.js"
+    },
+    {
+      "src": "/swagger-ui\\.css",
+      "dest": "node_modules/swagger-ui-express/static/swagger-ui.css"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.js"
     }
