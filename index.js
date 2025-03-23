@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import swaggerUiDist from 'swagger-ui-dist';
+import cors from 'cors';
 
 // Get the directory name using ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -47,6 +48,7 @@ swaggerDocument.servers = [
 ];
 
 // Middlewares
+app.use(cors());
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {

@@ -1,7 +1,10 @@
 openapi: 3.0.0
 info:
   title: User Generation Service
-  description: A simple Express.js API service that generates random user data with department assignments
+  description: |
+    A simple Express.js API service that generates random user data with department assignments.
+    
+    This API supports CORS (Cross-Origin Resource Sharing), allowing it to be accessed from web applications hosted on any domain.
   version: 1.0.0
   contact:
     name: API Support

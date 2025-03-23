@@ -127,6 +127,10 @@ The API implements rate limiting to prevent abuse. Clients are limited to:
 
 When the rate limit is exceeded, the API will respond with a 429 status code and the message: "Too many requests from this IP, please try again later."
 
+### CORS Support
+
+This API includes CORS (Cross-Origin Resource Sharing) support, allowing it to be accessed from web applications hosted on different domains. All origins are allowed to access the API, making it suitable for use in any frontend application.
+
 ## Dependencies
 
 - express - Web framework
