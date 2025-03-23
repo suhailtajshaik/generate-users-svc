@@ -6,22 +6,38 @@
       "use": "@vercel/node"
     },
     {
+      "src": "public/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "swagger.yaml",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/swagger-ui-bundle\\.js",
-      "dest": "node_modules/swagger-ui-express/static/swagger-ui-bundle.js"
+      "src": "/swagger-ui.css",
+      "dest": "/public/swagger-ui.css"
     },
     {
-      "src": "/swagger-ui-standalone-preset\\.js",
-      "dest": "node_modules/swagger-ui-express/static/swagger-ui-standalone-preset.js"
+      "src": "/swagger-ui-bundle.js",
+      "dest": "/public/swagger-ui-bundle.js"
     },
     {
-      "src": "/swagger-ui\\.css",
-      "dest": "node_modules/swagger-ui-express/static/swagger-ui.css"
+      "src": "/swagger-ui-standalone-preset.js",
+      "dest": "/public/swagger-ui-standalone-preset.js"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "dest": "/public/favicon-16x16.png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "dest": "/public/favicon-32x32.png"
+    },
+    {
+      "src": "/swagger.yaml",
+      "dest": "/index.js"
     },
     {
       "src": "/(.*)",

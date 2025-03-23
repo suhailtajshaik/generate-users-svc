@@ -50,8 +50,10 @@ swaggerDocument.servers = [
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "img-src": ["'self'", "data:", "https://cloudflare-ipfs.com/"]
+      defaultSrc: ["'self'", "unpkg.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "unpkg.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "unpkg.com"],
+      imgSrc: ["'self'", "data:", "https://cloudflare-ipfs.com/", "unpkg.com"]
     }
   }
 }));
@@ -118,39 +120,25 @@ function generateUsers(numUsers, deptList) {
 // Get the path to swagger-ui-dist
 const swaggerUiDistPath = swaggerUiDist.getAbsoluteFSPath();
 
+// Explicitly serve static files from swagger-ui-dist
+app.use('/swagger-ui.css', express.static(path.join(swaggerUiDistPath, 'swagger-ui.css')));
+app.use('/swagger-ui-bundle.js', express.static(path.join(swaggerUiDistPath, 'swagger-ui-bundle.js')));
+app.use('/swagger-ui-standalone-preset.js', express.static(path.join(swaggerUiDistPath, 'swagger-ui-standalone-preset.js')));
+app.use('/favicon-32x32.png', express.static(path.join(swaggerUiDistPath, 'favicon-32x32.png')));
+app.use('/favicon-16x16.png', express.static(path.join(swaggerUiDistPath, 'favicon-16x16.png')));
+
 // Serve Swagger UI static files
 app.use(express.static(swaggerUiDistPath));
 
 // Create a custom HTML for Swagger UI
 app.get('/', (req, res) => {
-  const swaggerInitializer = `
-    window.onload = function() {
-      const ui = SwaggerUIBundle({
-        url: "${serverUrl}/swagger.yaml",
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout"
-      });
-      window.ui = ui;
-    };
-  `;
-
   const html = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <title>User Generation Service API</title>
-      <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
-      <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
-      <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+      <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.0.0/swagger-ui.css">
       <style>
         html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
         *, *:before, *:after { box-sizing: inherit; }
@@ -159,9 +147,26 @@ app.get('/', (req, res) => {
     </head>
     <body>
       <div id="swagger-ui"></div>
-      <script src="./swagger-ui-bundle.js"></script>
-      <script src="./swagger-ui-standalone-preset.js"></script>
-      <script>${swaggerInitializer}</script>
+      <script src="https://unpkg.com/swagger-ui-dist@5.0.0/swagger-ui-bundle.js"></script>
+      <script src="https://unpkg.com/swagger-ui-dist@5.0.0/swagger-ui-standalone-preset.js"></script>
+      <script>
+        window.onload = function() {
+          const ui = SwaggerUIBundle({
+            url: "${serverUrl}/swagger.yaml",
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            plugins: [
+              SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout"
+          });
+          window.ui = ui;
+        };
+      </script>
     </body>
     </html>
   `;
