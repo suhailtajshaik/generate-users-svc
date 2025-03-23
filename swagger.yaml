@@ -1,0 +1,119 @@
+openapi: 3.0.0
+info:
+  title: User Generation Service
+  description: A simple Express.js API service that generates random user data with department assignments
+  version: 1.0.0
+  contact:
+    name: API Support
+servers:
+  - url: https://generate-users-svc.vercel.app
+    description: Production server
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /api/users/{count}:
+    get:
+      summary: Generate random users
+      description: Generates a specified number of random users with names, avatars, and department assignments
+      parameters:
+        - name: count
+          in: path
+          required: true
+          description: Number of users to generate (must be a positive integer)
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: A list of randomly generated users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid count parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /health:
+    get:
+      summary: Health check
+      description: Returns the health status of the API
+      responses:
+        '200':
+          description: Health status information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        avatar:
+          type: string
+          format: uri
+          example: https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1234.jpg
+        departments:
+          type: array
+          items:
+            type: string
+          example: ["Hardware", "Electrical"]
+        userId:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+      required:
+        - name
+        - avatar
+        - departments
+        - userId
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Invalid count. Please provide a positive integer.
+      required:
+        - error
+    
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        uptime:
+          type: string
+          example: 1h 23m 45s
+        timestamp:
+          type: string
+          format: date-time
+          example: 2023-05-01T12:34:56.789Z
+      required:
+        - status
+        - uptime
+        - timestamp 

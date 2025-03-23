@@ -6,6 +6,15 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import { faker } from '@faker-js/faker';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
+
+// Get the directory name using ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env file in development
 if (process.env.NODE_ENV !== 'production') {
@@ -15,8 +24,36 @@ if (process.env.NODE_ENV !== 'production') {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Determine the server URL based on environment
+const isProd = process.env.NODE_ENV === 'production';
+const serverUrl = isProd 
+  ? 'https://generate-users-svc.vercel.app' 
+  : `http://localhost:${PORT}`;
+
+// Load and modify Swagger document
+const swaggerPath = path.join(__dirname, 'swagger.yaml');
+let swaggerContent = fs.readFileSync(swaggerPath, 'utf8');
+
+// Create a modified Swagger document with the correct server URL
+const swaggerDocument = YAML.parse(swaggerContent);
+
+// Set the servers dynamically based on environment
+swaggerDocument.servers = [
+  {
+    url: serverUrl,
+    description: isProd ? 'Production server' : 'Local development server'
+  }
+];
+
 // Middlewares
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "img-src": ["'self'", "data:", "https://cloudflare-ipfs.com/"]
+    }
+  }
+}));
 app.use(compression());
 app.use(express.json());
 
@@ -77,6 +114,13 @@ function generateUsers(numUsers, deptList) {
   return users;
 }
 
+// Serve Swagger UI as the default route
+app.use('/', swaggerUi.serve);
+app.get('/', (req, res) => {
+  // Pass the dynamically modified swagger document
+  swaggerUi.setup(swaggerDocument)(req, res);
+});
+
 // API endpoint: /api/users/:count
 app.get('/api/users/:count', (req, res, next) => {
   try {
@@ -130,4 +174,5 @@ app.use((err, req, res, next) => {
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`Swagger UI available at: ${serverUrl}`);
 });

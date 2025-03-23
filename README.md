@@ -49,6 +49,17 @@ npm start
 
 ### API Documentation
 
+The API is documented using Swagger/OpenAPI. When you access the root URL of the deployed application, you'll see the interactive Swagger UI documentation.
+
+The Swagger UI automatically detects your environment:
+- In production: [https://generate-users-svc.vercel.app/](https://generate-users-svc.vercel.app/)
+- In development: [http://localhost:3000/](http://localhost:3000/)
+
+The Swagger UI allows you to:
+- Read detailed API documentation
+- Test API endpoints directly from your browser
+- See request/response schemas and examples
+
 #### Generate Random Users
 
 ```
