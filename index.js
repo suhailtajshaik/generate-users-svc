@@ -7,8 +7,10 @@ import rateLimit from 'express-rate-limit';
 import { faker } from '@faker-js/faker';
 import dotenv from 'dotenv';
 
-// Load environment variables from .env file
-dotenv.config();
+// Load environment variables from .env file in development
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -92,6 +94,27 @@ app.get('/api/users/:count', (req, res, next) => {
     next(error);
   }
 });
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  const uptime = process.uptime();
+  const uptimeFormatted = formatUptime(uptime);
+  
+  res.json({
+    status: 'ok',
+    uptime: uptimeFormatted,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Helper function to format uptime
+function formatUptime(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  
+  return `${hours}h ${minutes}m ${secs}s`;
+}
 
 // Catch-all for unknown routes (404)
 app.use((req, res, next) => {

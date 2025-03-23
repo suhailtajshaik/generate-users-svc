@@ -1,13 +1,13 @@
 {
   "name": "generate-users-svc",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple Express.js API service that generates random user data with department assignments",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": [],
+  "keywords": ["api", "express", "users", "generator"],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -22,5 +22,8 @@
   "type": "module",
   "devDependencies": {
     "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }

@@ -18,7 +18,7 @@ This service provides an API endpoint that generates a specified number of rando
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone https://github.com/suhailtajshaik/generate-users-svc.git
    cd generate-users-svc
    ```
 
@@ -133,3 +133,21 @@ When the rate limit is exceeded, the API will respond with a 429 status code and
 ## License
 
 ISC
+
+## Deployment
+
+This service can be deployed to Vercel with minimal configuration:
+
+1. Fork or clone this repository
+2. Deploy to Vercel using the Vercel CLI or GitHub integration
+3. Set required environment variables in the Vercel dashboard
+
+### Environment Variables for Production
+
+- `NODE_ENV`: Set to "production"
+- `PORT`: Automatically set by Vercel (you don't need to configure this)
+
+### Deployment URL
+
+Once deployed, your service will be available at:
+`https://generate-users-svc.vercel.app/api/users/:count`
